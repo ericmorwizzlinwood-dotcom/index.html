@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>ACESSO RESTRITO</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: monospace;
+  background: radial-gradient(circle at top, #0a0f14, #000);
+  color: #00ff88;
+}
+
+.screen {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.active { display: block; }
+
+h1 {
+  color: #00ffaa;
+  text-shadow: 0 0 10px #00ffaa;
+}
+
+input {
+  background: black;
+  color: #00ff88;
+  border: 1px solid #00ff88;
+  padding: 10px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #00ff88;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.error { color: #ff4444; margin-top: 10px; }
+
+.link-box {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #00ff88;
+  background: rgba(0,255,136,0.05);
+}
+
+a { color: #00ffaa; text-decoration: none; }
+
+.quote {
+  margin-top: 25px;
+  font-style: italic;
+  color: #b8ffdd;
+  line-height: 1.6em;
+}
+
+.counter {
+  position: fixed;
+  bottom: 10px;
+  right: 15px;
+  font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="login" class="screen active">
+  <h1>ACESSO BLOQUEADO</h1>
+  <p id="dayLabel"></p>
+  <input type="password" id="password" placeholder="Senha do dia">
+  <button onclick="checkPassword()">ENTRAR</button>
+  <div id="error" class="error"></div>
+</div>
+
+<div id="content" class="screen">
+  <h1 id="title"></h1>
+  <div class="link-box">
+    <a id="dailyLink" href="#" target="_blank">DESCUBERTA DO DIA</a>
+  </div>
+  <div id="quotes" class="quote"></div>
+</div>
+
+<div class="counter" id="counter"></div>
+
+<script>
+
+const startDate = new Date("2026-02-13T00:00:00");
+
+const passwords = [
+"Pater noster",
+"qui es in caelis",
+"sanctificetur nomen tuum",
+"adveniat regnum tuum",
+"fiat voluntas tua",
+"panem nostrum",
+"da nobis hodie",
+"dimitte nobis debita nostra",
+"sicut et nos dimittimus",
+"ne nos inducas in tentationem",
+"sed libera nos a malo",
+"Amen",
+"Gloria Patri",
+"et Filio",
+"et Spiritui Sancto"
+];
+
+const links = [
+"https://neal.fun/deep-sea/",
+"https://store.steampowered.com/app/620/Portal_2/",
+"https://letterboxd.com/",
+"https://neal.fun/infinite-craft/",
+"https://poki.com/en/g/subway-surfers",
+"https://archive.org/details/movies",
+"https://www.imdb.com/title/tt1104001/",
+"https://www.netflix.com/title/81215567",
+"https://itch.io/games/free",
+"https://radio.garden/",
+"https://www.youtube.com/watch?v=QBK3QpTOwG0",
+"https://www.chess.com/play/computer",
+"https://www.curtaon.com.br/",
+"https://www.mubi.com/",
+"https://neal.fun/space-elevator/"
+];
+
+const quotes = [
+"«O coração inquieto não descansa senão em Deus.» — Santo Agostinho",
+"«Onde está o Espírito do Senhor, aí está a liberdade.» — São Basílio",
+"«O Reino de Deus está dentro de vós.» — Lc 17,21",
+"«Conhece-te e conhecerás a Deus.» — São Gregório de Nissa",
+"«A cruz é a escola do amor.» — São João Crisóstomo",
+"«Deus se fez homem para que o homem se tornasse Deus.» — Santo Atanásio",
+"«Nada te perturbe.» — Santa Teresa",
+"«O silêncio é o mistério do mundo futuro.» — Isaac da Síria",
+"«Sede misericordiosos.» — Lc 6,36",
+"«A humildade é a base da santidade.» — São Bernardo",
+"«Cristo é tudo.» — São Máximo Confessor",
+"«A oração é luz.» — São João Damasceno",
+"«Tudo coopera para o bem.» — Rm 8,28",
+"«Permanecei em Mim.» — Jo 15,4",
+"«Está consumado.» — Jo 19,30"
+];
+
+const today = new Date();
+today.setHours(0,0,0,0);
+
+const dayIndex = Math.floor((today - startDate) / (1000*60*60*24));
+
+let progress = parseInt(localStorage.getItem("progress") || "0");
+
+document.getElementById("counter").innerText =
+"PROGRESSO: " + progress + " / 15";
+
+if (dayIndex < 0) {
+  document.getElementById("dayLabel").innerText = "Ainda não começou.";
+}
+else if (dayIndex >= 15) {
+  document.getElementById("dayLabel").innerText = "Todos os dias concluídos.";
+}
+else {
+  document.getElementById("dayLabel").innerText =
+  "Dia disponível: " + (dayIndex + 1);
+}
+
+function checkPassword() {
+
+  if (dayIndex < 0 || dayIndex >= 15) return;
+
+  if (dayIndex !== progress) {
+    document.getElementById("error").innerText =
+    "Dia ainda bloqueado.";
+    return;
+  }
+
+  const input = document.getElementById("password").value.trim();
+  const expected = passwords[dayIndex];
+
+  if (input === expected) {
+
+    progress++;
+    localStorage.setItem("progress", progress);
+
+    document.getElementById("login").classList.remove("active");
+    document.getElementById("content").classList.add("active");
+
+    document.getElementById("title").innerText =
+    "PARABÉNS — DIA " + progress + " CONCLUÍDO";
+
+    document.getElementById("dailyLink").href = links[dayIndex];
+    document.getElementById("quotes").innerText = quotes[dayIndex];
+
+    document.getElementById("counter").innerText =
+    "PROGRESSO: " + progress + " / 15";
+
+  } else {
+    document.getElementById("error").innerText = "Senha incorreta.";
+  }
+}
+
+</script>
+
+</body>
+</html>
